@@ -73,22 +73,32 @@ def inputs_personaje():
     tipo_arma = ''
     
     while True:
-        tipo = input('Digite el tipo de personaje (guerrero/mago): ')
-        if tipo != 'guerrero' and tipo != 'mago':
-            limpiar_pantalla()
-            print('\nERROR. Tipo de personaje incorrecto\n')
-            continue
-        nombre_personaje = input('Nombre del personaje: ')
-        daño = int(input('Daño del personaje: '))
-        vida = int(input('Vida del personaje: '))
-        defensa_fisica = int(input('Defensa fisica del personaje: '))
-        defensa_magica = int(input('Defensa magica del personaje: '))
-        if tipo == 'guerrero':
-            tipo_arma = input('Digite la espada del personaje: ')
-        elif tipo == 'mago':
-            tipo_arma = input('Digite la magia del personaje: ')
+        try:
+            tipo = input('Digite el tipo de personaje (guerrero/mago): ')
+            if tipo != 'guerrero' and tipo != 'mago':
+                limpiar_pantalla()
+                #print('\nERROR. Tipo de personaje incorrecto\n')
+                #continue
+                raise ValueError('Tipo de personaje inválido')
+            #Validacion de UNICAMENTE string en nombre gracias a .isalnum()
+            nombre_personaje = input('Nombre del personaje: ').strip()
+            if nombre_personaje.isalnum():
+                raise ValueError('No se admite numeros como nombre')
     
-        return tipo, nombre_personaje, daño, vida, defensa_fisica, defensa_magica, tipo_arma
+            daño = int(input('Daño del personaje: '))
+            vida = int(input('Vida del personaje: '))
+            defensa_fisica = int(input('Defensa fisica del personaje: '))
+            defensa_magica = int(input('Defensa magica del personaje: '))
+            if tipo == 'guerrero':
+                tipo_arma = input('Digite la espada del personaje: ')
+            elif tipo == 'mago':
+                tipo_arma = input('Digite la magia del personaje: ')
+        
+            return tipo, nombre_personaje, daño, vida, defensa_fisica, defensa_magica, tipo_arma
+        except ValueError as e:
+            limpiar_pantalla()
+            print(f'ERROR. Datos incorrectos. {e}')
+            continue
     
 def limpiar_pantalla():
     
