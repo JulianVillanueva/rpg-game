@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
 from os import system
+import logging
+
+logging.basicConfig(level=logging.DEBUG, 
+    format='%(asctime)s - %(levelname)s - %(message)s')
 
 class Personaje(ABC): 
     
@@ -74,17 +78,20 @@ def inputs_personaje():
     
     while True:
         try:
-            tipo = input('Digite el tipo de personaje (guerrero/mago): ')
+            tipo = input('Digite el tipo de personaje (guerrero/mago): ').lower()
             if tipo != 'guerrero' and tipo != 'mago':
                 limpiar_pantalla()
-                #print('\nERROR. Tipo de personaje incorrecto\n')
-                #continue
                 raise ValueError('Tipo de personaje inválido')
-            #Validacion de UNICAMENTE string en nombre gracias a .isalnum()
+            
+            
             nombre_personaje = input('Nombre del personaje: ').strip()
-            if nombre_personaje.isalnum():
-                raise ValueError('No se admite numeros como nombre')
-    
+            # Valiacion para evitar numeros, vacios, espacios, caracteres especiales. 
+            if not nombre_personaje.isalpha():
+                logging.error('El nombre no debe contener (Numeros, caracteres especiales)')
+                raise ValueError('El nombre no debe estar vacio ni contener: Numeros, caracteres especiales')
+            # or not nombre_personaje or nombre_personaje.isspace()
+            
+            
             daño = int(input('Daño del personaje: '))
             vida = int(input('Vida del personaje: '))
             defensa_fisica = int(input('Defensa fisica del personaje: '))
@@ -96,7 +103,6 @@ def inputs_personaje():
         
             return tipo, nombre_personaje, daño, vida, defensa_fisica, defensa_magica, tipo_arma
         except ValueError as e:
-            limpiar_pantalla()
             print(f'ERROR. Datos incorrectos. {e}')
             continue
     
