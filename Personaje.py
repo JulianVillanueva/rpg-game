@@ -71,6 +71,14 @@ class Personaje(ABC):
         print(f'{ganador.nombre} ha ganado la batalla  🎉')
         print(f'Vida final: 👑 {ganador.nombre} (❤️  {ganador.vida}) vs 💀 {perdedor.nombre} (❤️  {perdedor.vida})\n')
         ganador.subir_nivel()
+     
+class Atributo_Invalido(Exception):
+    """
+    No es recomendable agregar mas logica adicional como por ejemplo:
+    si el valor es negativo o no sobrecarga su responsabilidad y hace que sea más difícil de entender y mantener.
+    """
+    pass
+     
         
 def inputs_personaje():
     
@@ -78,32 +86,51 @@ def inputs_personaje():
     
     while True:
         try:
-            tipo = input('Digite el tipo de personaje (guerrero/mago): ').lower()
+            tipo = input('Digite el tipo de personaje (guerrero/mago): ').lower().strip()
             if tipo != 'guerrero' and tipo != 'mago':
                 limpiar_pantalla()
+                logging.error(f'Tipo de personaje inválido {tipo}')
                 raise ValueError('Tipo de personaje inválido')
             
             
             nombre_personaje = input('Nombre del personaje: ').strip()
-            # Valiacion para evitar numeros, vacios, espacios, caracteres especiales. 
+            # Validacion para evitar numeros, vacios, espacios, caracteres especiales. 
             if not nombre_personaje.isalpha():
-                logging.error('El nombre no debe contener (Numeros, caracteres especiales)')
+                logging.error(f'Nombre INCORRECTO (Numeros, caracteres especiales) {nombre_personaje}')
                 raise ValueError('El nombre no debe estar vacio ni contener: Numeros, caracteres especiales')
             # or not nombre_personaje or nombre_personaje.isspace()
             
-            
             daño = int(input('Daño del personaje: '))
+            if daño <= 0:
+                raise Atributo_Invalido("El daño debe ser un número entero positivo")
+
             vida = int(input('Vida del personaje: '))
+            if vida <= 0:
+                raise Atributo_Invalido("La vida debe ser un número entero positivo")
+
             defensa_fisica = int(input('Defensa fisica del personaje: '))
+            if defensa_fisica < 0:
+                raise Atributo_Invalido("La defensa física debe ser un número entero no negativo")
+
             defensa_magica = int(input('Defensa magica del personaje: '))
+            if defensa_magica < 0:
+                raise Atributo_Invalido("La defensa mágica debe ser un número entero no negativo")
+            
             if tipo == 'guerrero':
                 tipo_arma = input('Digite la espada del personaje: ')
             elif tipo == 'mago':
                 tipo_arma = input('Digite la magia del personaje: ')
         
             return tipo, nombre_personaje, daño, vida, defensa_fisica, defensa_magica, tipo_arma
+        
         except ValueError as e:
             print(f'ERROR. Datos incorrectos. {e}')
+            continue
+        except Atributo_Invalido as e: #Entra a esta excepcion cuando se ingresa un atributo negativo
+            print(f'ERROR personalizado. Datos incorrectos. {e}')
+            continue
+        except Exception as e:
+            print(f'ERROR excepcion. Datos incorrectos. {e}')
             continue
     
 def limpiar_pantalla():
