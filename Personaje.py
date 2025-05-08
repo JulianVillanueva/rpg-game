@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from os import system
 import logging
+from Validaciones import *
 
 logging.basicConfig(level=logging.DEBUG, 
     format='%(asctime)s - %(levelname)s - %(message)s')
 
-class Personaje(ABC): 
+class Personaje(): 
     
     nivel = 1
     pocion = 1
@@ -72,80 +73,49 @@ class Personaje(ABC):
         print(f'Vida final: 👑 {ganador.nombre} (❤️  {ganador.vida}) vs 💀 {perdedor.nombre} (❤️  {perdedor.vida})\n')
         ganador.subir_nivel()
      
-class Atributo_Invalido(Exception):
-    """
-    No es recomendable agregar mas logica adicional como por ejemplo:
-    si el valor es negativo o no sobrecarga su responsabilidad y hace que sea más difícil de entender y mantener.
-    """
-    pass
-     
-        
 def inputs_personaje():
+    
+    limpiar_pantalla()
     
     tipo_arma = ''
     
     while True:
         try:
-            tipo = input('Digite el tipo de personaje (guerrero/mago): ').lower().strip()
-            if tipo != 'guerrero' and tipo != 'mago':
-                limpiar_pantalla()
-                logging.error(f'Tipo de personaje inválido {tipo}')
-                raise ValueError('Tipo de personaje inválido')
+            tipo = validar_tipo(input('Digite el tipo de personaje (guerrero/mago): '))
+            break
+        except ValueError as e:
+            print(f'ERROR. Datos incorrectos. {e}')
+            continue
             
+    while True:   
+        try:     
+            nombre_personaje = validar_nombre(input('Nombre del personaje: '))
+            break
+        except ValueError as e:
+            print(f'ERROR. Datos incorrectos. {e}')
+            continue
             
-            nombre_personaje = input('Nombre del personaje: ').strip()
-            # Validacion para evitar numeros, vacios, espacios, caracteres especiales. 
-            if not nombre_personaje.isalpha():
-                logging.error(f'Nombre INCORRECTO (Numeros, caracteres especiales) {nombre_personaje}')
-                raise ValueError('El nombre no debe estar vacio ni contener: Numeros, caracteres especiales')
-            # or not nombre_personaje or nombre_personaje.isspace()
-            
-            daño = int(input('Daño del personaje: '))
-            if daño <= 0:
-                raise Atributo_Invalido("El daño debe ser un número entero positivo")
+    daño = validar_atributo_numerico('Daño del personaje: ')
+    vida = validar_atributo_numerico('Vida del personaje: ')
+    defensa_fisica = validar_atributo_numerico('Defensa física del personaje: ')
+    defensa_magica = validar_atributo_numerico('Defensa mágica del personaje: ')
 
-            vida = int(input('Vida del personaje: '))
-            if vida <= 0:
-                raise Atributo_Invalido("La vida debe ser un número entero positivo")
-
-            defensa_fisica = int(input('Defensa fisica del personaje: '))
-            if defensa_fisica < 0:
-                raise Atributo_Invalido("La defensa física debe ser un número entero no negativo")
-
-            defensa_magica = int(input('Defensa magica del personaje: '))
-            if defensa_magica < 0:
-                raise Atributo_Invalido("La defensa mágica debe ser un número entero no negativo")
-            
+    while True:
+        try:
             if tipo == 'guerrero':
                 tipo_arma = input('Digite la espada del personaje: ')
             elif tipo == 'mago':
                 tipo_arma = input('Digite la magia del personaje: ')
-        
-            return tipo, nombre_personaje, daño, vida, defensa_fisica, defensa_magica, tipo_arma
-        
-        except ValueError as e:
-            print(f'ERROR. Datos incorrectos. {e}')
-            continue
-        except Atributo_Invalido as e: #Entra a esta excepcion cuando se ingresa un atributo negativo
-            print(f'ERROR personalizado. Datos incorrectos. {e}')
-            continue
+            if not tipo_arma.strip():
+                raise ValueError(f'El tipo de arma no puede estar vacio\n')
+            if not tipo_arma.isalpha():
+                raise ValueError(f'El tipo de arma que ingresaste no es valido: {tipo_arma}\n')
+            break
         except Exception as e:
-            print(f'ERROR excepcion. Datos incorrectos. {e}')
-            continue
-    
-def limpiar_pantalla():
-    
-    system('clear')
+            print(f'Error: {e}')
+    return tipo, nombre_personaje, daño, vida, defensa_fisica, defensa_magica, tipo_arma
     
 def listar_personajes(personajes):
     
     for personaje in personajes:
-        print(f'''{personajes.index(personaje)+1}. {personaje}''')
-            
-def valida_personajes(lista_personajes = list):
-    
-    if len(lista_personajes) < 2:
-        limpiar_pantalla()
-        print('ERROR. No hay suficientes personajes para hacer eso. \n')
-        return False
-        
+        print(f'''{personajes.index(personaje)+1}. {personaje}''')  
